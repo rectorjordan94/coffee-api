@@ -1,19 +1,22 @@
 const mongoose = require('mongoose')
 
-const exampleSchema = new mongoose.Schema(
+const coffeeSchema = new mongoose.Schema(
 	{
-		title: {
+		name: {
 			type: String,
 			required: true,
 		},
-		text: {
+		brand: {
 			type: String,
 			required: true,
+		},
+		ounces: {
+			type: Number,
+			required: true
 		},
 		owner: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: 'User',
-			required: true,
+			ref: 'User'
 		},
 	},
 	{
@@ -21,4 +24,4 @@ const exampleSchema = new mongoose.Schema(
 	}
 )
 
-module.exports = mongoose.model('Example', exampleSchema)
+module.exports = mongoose.model('Example', coffeeSchema)
