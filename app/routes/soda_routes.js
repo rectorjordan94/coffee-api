@@ -3,8 +3,8 @@ const express = require('express')
 // Passport docs: http://www.passportjs.org/docs/
 const passport = require('passport')
 
-// pull in Mongoose model for coffees
-const Coffee = require('../models/coffee')
+// pull in Mongoose model for sodas
+const Soda = require('../models/soda')
 
 // this is a collection of methods that help us detect situations when we need
 // to throw a custom error
@@ -17,9 +17,9 @@ const handle404 = customErrors.handle404
 const requireOwnership = customErrors.requireOwnership
 
 // this is middleware that will remove blank fields from `req.body`, e.g.
-// { coffee: { title: '', text: 'foo' } } -> { coffee: { text: 'foo' } }
+// { soda: { title: '', text: 'foo' } } -> { soda: { text: 'foo' } }
 const removeBlanks = require('../../lib/remove_blank_fields')
-// passing this as a second argument to `router.<verb>` will make it
+// passing this asodas a second argument to `router.<verb>` will make it
 // so that a token MUST be passed for that route to be available
 // it will also set `req.user`
 const requireToken = passport.authenticate('bearer', { session: false })
@@ -28,43 +28,43 @@ const requireToken = passport.authenticate('bearer', { session: false })
 const router = express.Router()
 
 // INDEX
-// GET /coffees
-router.get('/coffees', requireToken, (req, res, next) => {
-	Coffee.find()
-		.then((coffees) => {
-			// `coffees` will be an array of Mongoose documents
+// GET /sodas
+router.get('/sodas', (req, res, next) => {
+	Soda.find()
+		.then((sodas) => {
+			// `sodas` will be an array of Mongoose documents
 			// we want to convert each one to a POJO, so we use `.map` to
 			// apply `.toObject` to each one
-			return coffees.map((coffee) => coffee.toObject())
+			return sodas.map((soda) => soda.toObject())
 		})
-		// respond with status 200 and JSON of the coffees
-		.then((coffees) => res.status(200).json({ coffees: coffees }))
+		// respond with status 200 and JSON of the sodas
+		.then((sodas) => res.status(200).json({ sodas: sodas }))
 		// if an error occurs, pass it to the handler
 		.catch(next)
 })
 
 // SHOW
-// GET /coffees/5a7db6c74d55bc51bdf39793
-router.get('/coffees/:id', requireToken, (req, res, next) => {
+// GET /sodas/5a7db6c74d55bc51bdf39793
+router.get('/sodas/:id', (req, res, next) => {
 	// req.params.id will be set based on the `:id` in the route
-	Coffee.findById(req.params.id)
+	Soda.findById(req.params.id)
 		.then(handle404)
-		// if `findById` is succesful, respond with 200 and "coffee" JSON
-		.then((coffee) => res.status(200).json({ coffee: coffee.toObject() }))
+		// if `findById` is succesful, respond with 200 and "soda" JSON
+		.then((soda) => res.status(200).json({ soda: soda.toObject() }))
 		// if an error occurs, pass it to the handler
 		.catch(next)
 })
 
 // CREATE
-// POST /coffees
-router.post('/coffees', requireToken, (req, res, next) => {
-	// set owner of new coffee to be current user
-	req.body.coffee.owner = req.user.id
+// POST /sodas
+router.post('/sodas', requireToken, (req, res, next) => {
+	// set owner of new soda to be current user
+	req.body.soda.owner = req.user.id
 
-	Coffee.create(req.body.coffee)
-		// respond to succesful `create` with status 201 and JSON of new "coffee"
-		.then((coffee) => {
-			res.status(201).json({ coffee: coffee.toObject() })
+	Soda.create(req.body.soda)
+		// respond to succesful `create` with status 201 and JSON of new "soda"
+		.then((soda) => {
+			res.status(201).json({ soda: soda.toObject() })
 		})
 		// if an error occurs, pass it off to our error handler
 		// the error handler needs the error message and the `res` object so that it
@@ -73,21 +73,21 @@ router.post('/coffees', requireToken, (req, res, next) => {
 })
 
 // UPDATE
-// PATCH /coffees/5a7db6c74d55bc51bdf39793
-router.patch('/coffees/:id', requireToken, removeBlanks, (req, res, next) => {
+// PATCH /sodas/5a7db6c74d55bc51bdf39793
+router.patch('/sodas/:id', requireToken, removeBlanks, (req, res, next) => {
 	// if the client attempts to change the `owner` property by including a new
 	// owner, prevent that by deleting that key/value pair
-	delete req.body.coffee.owner
+	delete req.body.soda.owner
 
-	Coffee.findById(req.params.id)
+	Soda.findById(req.params.id)
 		.then(handle404)
-		.then((coffee) => {
+		.then((soda) => {
 			// pass the `req` object and the Mongoose record to `requireOwnership`
 			// it will throw an error if the current user isn't the owner
-			requireOwnership(req, coffee)
+			requireOwnership(req, soda)
 
 			// pass the result of Mongoose's `.update` to the next `.then`
-			return coffee.updateOne(req.body.coffee)
+			return soda.updateOne(req.body.soda)
 		})
 		// if that succeeded, return 204 and no JSON
 		.then(() => res.sendStatus(204))
@@ -96,15 +96,15 @@ router.patch('/coffees/:id', requireToken, removeBlanks, (req, res, next) => {
 })
 
 // DESTROY
-// DELETE /coffees/5a7db6c74d55bc51bdf39793
-router.delete('/coffees/:id', requireToken, (req, res, next) => {
-	Coffee.findById(req.params.id)
+// DELETE /sodas/5a7db6c74d55bc51bdf39793
+router.delete('/sodas/:id', requireToken, (req, res, next) => {
+	Soda.findById(req.params.id)
 		.then(handle404)
-		.then((coffee) => {
-			// throw an error if current user doesn't own `coffee`
-			requireOwnership(req, coffee)
-			// delete the coffee ONLY IF the above didn't throw
-			coffee.deleteOne()
+		.then((soda) => {
+			// throw an error if current user doesn't own `soda`
+			requireOwnership(req, soda)
+			// delete the soda ONLY IF the above didn't throw
+			soda.deleteOne()
 		})
 		// send back 204 and no content if the deletion succeeded
 		.then(() => res.sendStatus(204))

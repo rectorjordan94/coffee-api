@@ -1,19 +1,22 @@
 const mongoose = require('mongoose')
 
-const coffeeSchema = new mongoose.Schema(
+const nutritionFactSchema = require('./nutritionFact')
+
+const sodaSchema = new mongoose.Schema(
 	{
 		name: {
 			type: String,
 			required: true,
 		},
-		brand: {
+		details: {
 			type: String,
 			required: true,
 		},
-		ounces: {
-			type: Number,
+		hasCaffeine: {
+			type: Boolean,
 			required: true
 		},
+		nutritionFacts: [nutritionFactSchema],
 		owner: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'User'
@@ -24,4 +27,4 @@ const coffeeSchema = new mongoose.Schema(
 	}
 )
 
-module.exports = mongoose.model('Example', coffeeSchema)
+module.exports = mongoose.model('Soda', sodaSchema)
