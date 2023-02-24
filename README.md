@@ -1,6 +1,6 @@
 # Soda API
 
-Deployment link: https://main--dreamy-pavlova-642e0a.netlify.app/
+Deployment link: https://dreamy-pavlova-642e0a.netlify.app/
 
 This api will allow the users of our react front-end application to CRUD sodas
 
